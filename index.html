@@ -1,0 +1,34 @@
+/<!doctype html>
+<html>
+  <head>
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+    <link rel='stylesheet' type='text/css' href='/resources/tutorial/css/example.css'>
+  </head>
+  <body>
+    <div id='notesDiv'></div>
+    <input type='text' id='noteTitle' placeholder='Note Title'>
+    <input type='text' id='noteTask' placeholder='Note Description'>
+    <button type='button' id='submitButton'>Submit!</button>
+    <script>
+      var myDataRef = new Firebase('https://bdjbpirsom0.firebaseio-demo.com/');
+      $('#submitButton').click(function (e) {
+        if ($('#noteTitle').val() != null && $('#noteTask').val() != null) {
+          var title = $('#noteTitle').val();
+          var description = $('#noteTask').val();
+          myDataRef.push({title: title, description: description, done: false});
+          $('#noteTitle').val('');
+          $('#noteTask').val('');
+        }
+      });
+      myDataRef.on('child_added', function(snapshot) {
+        var note = snapshot.val();
+        addNote(note.title, note.description);
+      });
+      function addNote(title, description) {
+        $('<div/>').text(description).prepend($('<em/>').text(title+': ')).appendTo($('#notesDiv'));
+        $('#notesDiv')[0].scrollTop = $('#notesDiv')[0].scrollHeight;
+      };
+    </script>
+  </body>
+</html>
