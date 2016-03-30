@@ -12,36 +12,43 @@
     <input type='text' id='noteTask' placeholder='Note Description'>
     <button type='button' id='submitButton'>Submit!</button>
     <script>
-      var myDataRef = new Firebase('https://blinding-torch-7040.firebaseio.com/');
-      $('#submitButton').click(function (e) {
-        if ($('#noteTitle').val() != null && $('#noteTask').val() != null) {
-          var title = $('#noteTitle').val();
-          var description = $('#noteTask').val();
-          myDataRef.push({title: title, description: description, done: false});
-          $('#noteTitle').val('');
-          $('#noteTask').val('');
-        }
+      var myDataRef = new Firebase('https://blinding-torch-7040.firebaseio.com/');//My Firebase Data Reference
+      $('#submitButton').click(function (e) 
+      {
+            if ($('#noteTitle').val() != null && $('#noteTask').val() != null) 
+            {
+                var title = $('#noteTitle').val();
+                var description = $('#noteTask').val();
+                myDataRef.push({title: title, description: description});
+                $('#noteTitle').val('');
+                $('#noteTask').val('');
+            }
       });
-      myDataRef.on('child_added', function(snapshot) {
-        var note = snapshot.val();
-        var key = snapshot.key();
-        addNote(note.title, note.description,key);
+      myDataRef.on('child_added', function(snapshot) //Event Listener when a child has been added
+      {
+            var note = snapshot.val();
+            var key = snapshot.key();
+            addNote(note.title, note.description,key);//adds the note to firebase
       });
-      myDataRef.on('child_removed', function(snapshot) {
-          var note = snapshot.val();
-          alert('You Removed:' + note.title);
-          $('#' + snapshot.key()).remove();
+      myDataRef.on('child_removed', function(snapshot) //Event Listener when a child as been removed
+      {
+            var note = snapshot.val();
+            alert('You Removed:' + note.title);
+            $('#' + snapshot.key()).remove();//removes the task from the HTML page
       });
-      function addNote(title, description, key) {
-        $('#notesDiv').append('<p id = "' + key + '">' + title + ':' + description + '</p>');
-        $('#' + key).click(function (e){
-            $('#' + key).replaceWith('<p id = "' + key + '"><del>' + title + ':' + description + '</del></p>');
-            $('#' + key).append('<button id= "' + key + 'button">Remove!</button>');
-            $('#' + key + "button").click(function (e){
-                myDataRef.child(key).remove();
+      function addNote(title, description, key) //Function for adding a note to the notepad
+      {
+            $('#notesDiv').append('<p id = "' + key + '">' + title + ':' + description + '</p>');
+            $('#' + key).click(function (e)
+            {
+                $('#' + key).replaceWith('<p id = "' + key + '"><del>' + title + ':' + description + '</del></p>');//Marks the task as done by putting a line
+                $('#' + key).append('<button id= "' + key + 'button">Remove!</button>');//Adds a button that lets the user remove the task permanently
+                $('#' + key + "button").click(function (e)
+                {
+                    myDataRef.child(key).remove();
+                });
             });
-        });
-        $('#notesDiv')[0].scrollTop = $('#notesDiv')[0].scrollHeight;
+            $('#notesDiv')[0].scrollTop = $('#notesDiv')[0].scrollHeight;
       };
     </script>
   </body>
