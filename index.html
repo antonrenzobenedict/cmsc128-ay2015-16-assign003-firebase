@@ -1,6 +1,7 @@
-/<!doctype html>
+<!doctype html>
 <html>
   <head>
+    <meta charset = "UTF-8">
     <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
     <link rel='stylesheet' type='text/css' href='/resources/tutorial/css/example.css'>
@@ -23,10 +24,23 @@
       });
       myDataRef.on('child_added', function(snapshot) {
         var note = snapshot.val();
-        addNote(note.title, note.description);
+        var key = snapshot.key();
+        addNote(note.title, note.description,key);
       });
-      function addNote(title, description) {
-        $('<div/>').text(description).prepend($('<em/>').text(title+': ')).appendTo($('#notesDiv'));
+      myDataRef.on('child_removed', function(snapshot) {
+          var note = snapshot.val();
+          alert('You Removed:' + note.title);
+          $('#' + snapshot.key()).remove();
+      });
+      function addNote(title, description, key) {
+        $('#notesDiv').append('<p id = "' + key + '">' + title + ':' + description + '</p>');
+        $('#' + key).click(function (e){
+            $('#' + key).replaceWith('<p id = "' + key + '"><del>' + title + ':' + description + '</del></p>');
+            $('#' + key).append('<button id= "' + key + 'button">Remove!</button>');
+            $('#' + key + "button").click(function (e){
+                myDataRef.child(key).remove();
+            });
+        });
         $('#notesDiv')[0].scrollTop = $('#notesDiv')[0].scrollHeight;
       };
     </script>
